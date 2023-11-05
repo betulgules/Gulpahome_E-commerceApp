@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Capstone Project</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cart">Cart</string>
+    <string name="textview">TextView</string>
+    <string name="todo">TODO</string>
+</resources>
