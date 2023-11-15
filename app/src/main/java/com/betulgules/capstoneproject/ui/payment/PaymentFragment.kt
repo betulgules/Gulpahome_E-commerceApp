@@ -2,51 +2,63 @@ package com.betulgules.capstoneproject.ui.payment
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.betulgules.capstoneproject.R
 import com.betulgules.capstoneproject.common.viewBinding
 import com.betulgules.capstoneproject.databinding.FragmentPaymentBinding
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PaymentFragment : Fragment(R.layout.fragment_payment) {
 
     private val binding by viewBinding(FragmentPaymentBinding::bind)
+    private val viewModel by viewModels<PaymentViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val etCardholderName = view.findViewById<EditText>(R.id.etCardholderName)
-        val etCardNumber = view.findViewById<EditText>(R.id.etCardNumber)
-        val etExpiryMonth = view.findViewById<EditText>(R.id.etExpiryMonth)
-        val etExpiryYear = view.findViewById<EditText>(R.id.etExpiryYear)
-        val etCVC = view.findViewById<EditText>(R.id.etCVC)
-        val etAddress = view.findViewById<EditText>(R.id.etAddress)
-        val btnPay = view.findViewById<Button>(R.id.btnPay)
+        with(binding) {
+            val etCardholderName = etCardholderName
+            val etCardNumber = etCardNumber
+            val etExpiryMonth = etExpiryMonth
+            val etExpiryYear = etExpiryYear
+            val etCVC = etCVC
+            val etAddress = etAddress
+            val btnPay = btnPay
 
-        btnPay.setOnClickListener {
-            val cardholderName = etCardholderName.text.toString()
-            val cardNumber = etCardNumber.text.toString()
-            val expiryMonth = etExpiryMonth.text.toString()
-            val expiryYear = etExpiryYear.text.toString()
-            val cvc = etCVC.text.toString()
-            val address = etAddress.text.toString()
+            btnPay.setOnClickListener {
+                val cardholderName = etCardholderName.text.toString()
+                val cardNumber = etCardNumber.text.toString()
+                val expiryMonth = etExpiryMonth.text.toString()
+                val expiryYear = etExpiryYear.text.toString()
+                val cvc = etCVC.text.toString()
+                val address = etAddress.text.toString()
 
-            if (cardholderName.isEmpty() || cardNumber.length != 16 || expiryMonth.isEmpty() || expiryYear.isEmpty() || cvc.length != 3 || address.isEmpty()) {
-                Snackbar.make(view, "Lütfen tüm bilgileri eksiksiz ve doğru girin.", Snackbar.LENGTH_SHORT).show()
-            } else {
-                // Ödeme işlemini gerçekleştir
-                if (btnPay.isPressed.equals(true)){
-                    //navigateToSuccess()
+                viewModel.makePayment(cardholderName, cardNumber, expiryMonth, expiryYear, cvc, address)
+            }
+        }
+
+        observeData()
+    }
+
+    private fun observeData() {
+        viewModel.paymentState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is PaymentState.Loading -> {
+                    // Loading durumunu görselleştirebilirsiniz, örneğin bir progress bar göstererek
+                }
+                is PaymentState.SuccessState -> {
+                    findNavController().navigate(R.id.paymentToSuccess)
+                }
+                is PaymentState.ShowPopUp -> {
+                    // Hata durumu, kullanıcıya bir hata mesajı gösterebilirsiniz
+                    Snackbar.make(requireView(), state.errorMessage, Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
-        binding.btnPay.setOnClickListener {
-            findNavController().navigate(R.id.paymentToSuccess) }
-
     }
 }
 

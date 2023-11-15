@@ -5,21 +5,21 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import com.betulgules.capstoneproject.MainApplication
 import com.betulgules.capstoneproject.R
 import com.betulgules.capstoneproject.common.viewBinding
 import com.betulgules.capstoneproject.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 
-
+@AndroidEntryPoint
 class MainActivity() : AppCompatActivity() {
     private val binding by viewBinding(ActivityMainBinding::inflate)
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        MainApplication.provideRetrofit(this)
 
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment

@@ -3,58 +3,58 @@ package com.betulgules.capstoneproject.ui.signin
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.betulgules.capstoneproject.R
+import com.betulgules.capstoneproject.common.gone
 import com.betulgules.capstoneproject.common.viewBinding
+import com.betulgules.capstoneproject.common.visible
 import com.betulgules.capstoneproject.databinding.FragmentSignInBinding
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
     private val binding by viewBinding(FragmentSignInBinding::bind)
 
-    private lateinit var auth: FirebaseAuth
+    private val viewModel by viewModels<SignInViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        auth = FirebaseAuth.getInstance()
+        with(binding) {
 
-        auth.currentUser?.let {
-            findNavController().navigate(R.id.action_signInFragment_to_homeFragment)
+            btnSignIn.setOnClickListener {
+                val email = etEmail1.text.toString()
+                val password = etPassword1.text.toString()
+
+                viewModel.checkFields(email,password)
+            }
+
+            textView.setOnClickListener {
+                findNavController().navigate(R.id.signInToSignUp)
+            }
         }
 
-        with(binding) {
-            btnSignIn.setOnClickListener {
+        observeData()
+    }
 
-                val et_email1 = etEmail1.text.toString()
-                val et_password1 = etPassword1.text.toString()
+    private fun observeData() = with(binding) {
+        viewModel.signInState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                SignInState.Loading -> progressBar.visible()
 
-                if (CheckFields(et_email1, et_password1)) {
-                    loginToFirebase(et_email1, et_password1)
+                is SignInState.GoToHome -> {
+                    progressBar.gone()
+                    findNavController().navigate(R.id.signInToMainGraph)
+                }
+
+                is SignInState.ShowPopUp -> {
+                    progressBar.gone()
+                    Snackbar.make(requireView(), state.errorMessage, 1000).show()
                 }
             }
-            textView.setOnClickListener {
-                val action = SignInFragmentDirections.actionSignInFragmentToSignUpFragment()
-                findNavController().navigate(action)
-            }
-        }
-    }
-
-    fun CheckFields(email: String, password: String): Boolean {
-        return when {
-            email.isEmpty() -> false
-            password.isEmpty() -> false
-            else -> true
-        }
-    }
-
-    fun loginToFirebase(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
-            findNavController().navigate(R.id.action_signInFragment_to_homeFragment)
-        }.addOnFailureListener {
-            Snackbar.make(requireView(), it.message.orEmpty(), 1000).show()
         }
     }
 }

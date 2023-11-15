@@ -7,6 +7,19 @@
     android:layout_height="match_parent"
     tools:context=".ui.signup.SignUpFragment">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="180dp"
+        android:layout_marginEnd="180dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/till_email2"
         android:layout_width="409dp"
@@ -32,7 +45,7 @@
         android:id="@+id/till_password2"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/buttonkayit"
+        app:layout_constraintBottom_toTopOf="@+id/btnKayit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,13 +62,28 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/buttonkayit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/btnKayit"
+        android:layout_width="169dp"
+        android:layout_height="44dp"
         android:text="Kaydol"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/till_password2" />
+
+    <TextView
+        android:id="@+id/btnGirisYap"
+        android:layout_width="270dp"
+        android:layout_height="29dp"
+        android:background="@color/colorPrimary"
+        android:text="  If you have an account, Sign Up! "
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnKayit"
+        app:layout_constraintVertical_bias="0.175" />
 </androidx.constraintlayout.widget.ConstraintLayout>

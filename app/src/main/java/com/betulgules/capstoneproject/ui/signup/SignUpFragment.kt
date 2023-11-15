@@ -3,50 +3,62 @@ package com.betulgules.capstoneproject.ui.signup
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.betulgules.capstoneproject.R
+import com.betulgules.capstoneproject.common.gone
 import com.betulgules.capstoneproject.common.viewBinding
+import com.betulgules.capstoneproject.common.visible
 import com.betulgules.capstoneproject.databinding.FragmentSignUpBinding
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
     private val binding by viewBinding(FragmentSignUpBinding::bind)
 
-    private lateinit var auth: FirebaseAuth
+    private val viewModel by viewModels<SignUpViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        auth = FirebaseAuth.getInstance()
+        with(binding) {
+            btnKayit.setOnClickListener {
+                val email = etEmail2.text.toString()
+                val password = etPassword2.text.toString()
 
-        with(binding){
+                viewModel.checkFields(email,password)
+            }
 
-            buttonkayit.setOnClickListener {
-                val et_email2 = etEmail2.text.toString()
-                val et_password2 = etPassword2.text.toString()
-                if(CheckFields(et_email2, et_password2)){
-                    signUp(et_email2, et_password2 )
-                }
+            btnGirisYap.setOnClickListener {
+                findNavController().navigate(R.id.signUpToSignIn)
             }
         }
+
+        observeData()
     }
 
-    fun CheckFields(email: String, password: String): Boolean {
-        return when {
-            email.isEmpty() -> false
-            password.isEmpty() -> false
-            else -> true
+    private fun observeData() = with(binding) {
+        viewModel.signUpState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                SignUpState.Loading -> progressBar.visible()
+
+                is SignUpState.GoToHome -> {
+                    progressBar.gone()
+                    findNavController().navigate(R.id.signUpToMainGraph)
+                }
+
+                is SignUpState.ShowPopUp -> {
+                    progressBar.gone()
+                    Snackbar.make(requireView(), state.errorMessage, 1000).show()
+                }
+
+                else -> {
+                    progressBar.gone()
+                    Snackbar.make(requireView(), "Bir hata oluştu.", 1000).show()}
+            }
         }
-    }
-
-    private fun signUp(email: String, password: String){
-        auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
-            findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
-        }.addOnFailureListener {
-            Snackbar.make(requireView(), it.message.orEmpty(), 1000).show()
-         }
     }
 }

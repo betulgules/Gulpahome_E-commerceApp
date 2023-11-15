@@ -1,19 +1,20 @@
 package com.betulgules.capstoneproject.ui.cart
 
+import android.graphics.Paint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.betulgules.capstoneproject.data.model.response.Product
+import com.betulgules.capstoneproject.data.model.response.ProductUI
 import com.betulgules.capstoneproject.databinding.ItemCartBinding
 import com.bumptech.glide.Glide
-import kotlin.reflect.KFunction1
 
 class CartAdapter(
     private val onProductClick: (Int) -> Unit,
     private val onDeleteClick: (Int) -> Unit
-) : ListAdapter<Product, CartAdapter.CartViewHolder>(CartViewHolder.ProductDiffUtilCallBack()) {
+) : ListAdapter<ProductUI, CartAdapter.CartViewHolder>(CartViewHolder.ProductDiffUtilCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
         return CartViewHolder(
@@ -30,33 +31,42 @@ class CartAdapter(
         private val onDeleteClick: (Int) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(product: Product) {
+        fun bind(product: ProductUI) {
             with(binding) {
                 tvTitleCart.text = product.title
-                tvPriceCart.text = "${product.price} ₺"
+                tvPrice.text = "${product.price} ₺"
+
+                if (product.saleState == true) {
+                    tvSalePrice.visibility = View.VISIBLE
+                    tvSalePrice.text = "${product.salePrice} ₺"
+                    tvSalePrice.paintFlags = tvPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    tvSalePrice.visibility = View.GONE
+                    tvPrice.paintFlags = 0
+                }
 
                 Glide.with(ivCart).load(product.imageOne).into(ivCart)
 
-                ivDeleteCart.setOnClickListener {
-                    onDeleteClick(product.id ?: 1)
+                ivDelete.setOnClickListener {
+                    onDeleteClick(product.id)
                 }
 
                 root.setOnClickListener {
-                    onProductClick(product.id ?: 1)
+                    onProductClick(product.id)
                 }
 
 
             }
-    }
-
-        class ProductDiffUtilCallBack : DiffUtil.ItemCallback<Product>() {
-        override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return oldItem == newItem
+        class ProductDiffUtilCallBack : DiffUtil.ItemCallback<ProductUI>() {
+            override fun areItemsTheSame(oldItem: ProductUI, newItem: ProductUI): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: ProductUI, newItem: ProductUI): Boolean {
+                return oldItem == newItem
+            }
         }
-    }
     }
 }

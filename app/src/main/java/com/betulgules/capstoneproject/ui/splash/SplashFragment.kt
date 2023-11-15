@@ -1,38 +1,37 @@
 package com.betulgules.capstoneproject.ui.splash
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.betulgules.capstoneproject.R
+import com.betulgules.capstoneproject.common.viewBinding
+import com.betulgules.capstoneproject.databinding.FragmentSplashBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-class SplashFragment : Fragment() {
-    private val splashDelay: Long = 3000 // 3 saniye
-    private fun navigateToNextScreen() {
+@AndroidEntryPoint
+class SplashFragment : Fragment(R.layout.fragment_splash) {
 
+    private val viewModel by viewModels<SplashViewModel>()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeData()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_splash, container, false)
+    private fun observeData() {
+        viewModel.splashState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                SplashState.GoToSignIn -> {
+                    findNavController().navigate(R.id.splashToSignIn)
+                }
 
-        // Logo görüntüsünü 3 saniye boyunca görüntüle
-        val logoImageView = view.findViewById<ImageView>(R.id.ic_logo)
-        logoImageView.visibility = View.VISIBLE
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            findNavController().navigate(R.id.action_splashFragment_to_signInFragment)
-        }, splashDelay)
-
-        return view
+                SplashState.GoToHome -> {
+                    findNavController().navigate(R.id.splashToMainGraph)
+                }
+            }
+        }
     }
-
-
 }
+

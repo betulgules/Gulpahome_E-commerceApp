@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1036178528667",
-    "project_id": "capstoneproject-26e35",
-    "storage_bucket": "capstoneproject-26e35.appspot.com"
+    "project_number": "228473545137",
+    "project_id": "capstoneproject-194e8",
+    "storage_bucket": "capstoneproject-194e8.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1036178528667:android:18f9821466f0c443faa93e",
+        "mobilesdk_app_id": "1:228473545137:android:53d55e6df63a918b01dd90",
         "android_client_info": {
           "package_name": "com.betulgules.capstoneproject"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAcuKTvvEePEPTDZJmwRbTZP727qbyB1p0"
+          "current_key": "AIzaSyDd2yYe6MOMIDNjsHPmtp0tsZ3m6igJjE4"
         }
       ],
       "services": {

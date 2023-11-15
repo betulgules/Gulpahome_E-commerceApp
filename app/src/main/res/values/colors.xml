@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="startColor">#FCBC5D</color>
+    <color name="CenterColor">#FCB75D</color>
+    <color name="endColor">#FCAC5D</color>
+    <color name="colorPrimary">#FCC75D</color>
+    <color name="colorPrimaryVariant">#FCCC5D</color>
+    <color name="colorOnPrimary">#FCD45D</color>
+
+    <color name="colorSecondary">#FCC75D</color>
+    <color name="colorSecondaryVariant">#FCCC5D</color>
+    <color name="colorOnSecondary">#FCD45D</color>
+
+
+    <color name="textColor">#FFFFFFFF</color>
+    <color name="buttonColor">#FCAC5D</color>
+
+
+
 </resources>

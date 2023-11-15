@@ -1,85 +1,86 @@
 package com.betulgules.capstoneproject.ui.search
+
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.betulgules.capstoneproject.MainApplication
 import com.betulgules.capstoneproject.R
 import com.betulgules.capstoneproject.common.viewBinding
-import com.betulgules.capstoneproject.data.model.response.SearchProductResponse
 import com.betulgules.capstoneproject.databinding.FragmentSearchBinding
-import com.betulgules.capstoneproject.ui.home.ProductsAdapter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
-class SearchFragment : Fragment(R.layout.fragment_search){
+@AndroidEntryPoint
+class SearchFragment : Fragment(R.layout.fragment_search) {
 
-    //private val binding by viewBinding(FragmentSearchBinding::bind)
+    private val binding by viewBinding(FragmentSearchBinding::bind)
 
-    //private val productsAdapter: ProductsAdapter = ProductsAdapter(onProductClick = ::onProductClick)
+    private val viewModel by viewModels<SearchViewModel>()
 
-    private lateinit var searchView: SearchView
-    private lateinit var recyclerView: RecyclerView
+    private val searchAdapter = SearchAdapter(
+        onProductClick = ::onProductClick
+    )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_search, container, false)
-        searchView = view.findViewById(R.id.searchView)
-        recyclerView = view.findViewById(R.id.recyclerView)
+        with(binding) {
+            recyclerView.adapter = searchAdapter
 
-
-        // RecyclerView için bir LinearLayoutManager ayarlayın
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        // SearchView'a metin girildiğinde dinleyici ekleyin
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // Kullanıcı arama yapmak için "Enter" tuşuna bastığında burası çalışır
-                query?.let {}
-                SearchProduct()
-                return true
+            ivBack.setOnClickListener {
+                findNavController().navigateUp()
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Arama metni her değiştiğinde burası çalışır
-                // (isteğe bağlı olarak burada canlı arama yapabilirsiniz)
-                return false
-            }
-        })
+            binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return false
+                }
 
-        return view
-    }
+                override fun onQueryTextChange(newText: String?): Boolean {
 
-    private fun SearchProduct() {
-        MainApplication.productService?.searchProduct()
-            ?.enqueue(object : Callback<SearchProductResponse> {
+                    newText?.let {
 
-                override fun onResponse(
-                    call: Call<SearchProductResponse>,
-                    response: Response<SearchProductResponse>
-                ) {
-                    val result = response.body()
-        // Burada search_product.php veya başka bir yöntemle arama yapabilir ve sonuçları alabilirsiniz.
-        // Aldığınız sonuçları RecyclerView ile göstermelisiniz.
-        // Örnek olarak, verileri bir liste ile doldurup RecyclerView'a bağlamayı unutmayın.
-    }
+                        if (it.length >= 3) {
+                            viewModel.searchProduct(it)
 
-                override fun onFailure(call: Call<SearchProductResponse>, t: Throwable) {
-                    Log.e("SearchProduct", t.message.orEmpty())
+                        }
+                        else {
+                            searchAdapter.submitList(emptyList())
+                        }
+                    }
+                    return true
                 }
             })
+        }
+        observeData()
     }
 
-    private fun onProductClick(productList: ArrayList<SearchProductResponse>) {
-        findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToDetailFragment(id))
+    private fun observeData() {
+        viewModel.searchState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is SearchState.Loading -> {
+
+                }
+                is SearchState.SuccessState -> {
+
+                    searchAdapter.submitList(state.products)
+                }
+                is SearchState.ShowPopUp -> {
+
+                    Snackbar.make(requireView(), state.errorMessage, 1000).show()
+
+                }
+                is SearchState.EmptyScreen -> {
+
+                    Snackbar.make(requireView(), state.failMessage, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
+
+    private fun onProductClick(id: Int) {
+        findNavController().navigate(SearchFragmentDirections.searchToDetail(id))
+    }
+
 }
